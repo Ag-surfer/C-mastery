@@ -168,13 +168,13 @@ See [Diagram 2: Process Memory Map](#layer-4-diagrams) for the visual representa
 
 ### Diagram 1: The Compilation Pipeline
 
-![Compilation Pipeline](diagrams/ch01-compilation-pipeline.excalidraw)
+![Compilation Pipeline](diagrams/ch01-compilation-pipeline.svg)
 
 This diagram shows the four-stage transformation from source code to executable. Each stage is a separate program (preprocessor, compiler, assembler, linker) that produces a distinct intermediate file. The `gcc` command is actually a driver that invokes each stage in sequence. You can stop at any stage using the flags shown (`-E`, `-S`, `-c`).
 
 ### Diagram 2: Process Memory Map
 
-![Process Memory Map](diagrams/ch01-process-memory-map.excalidraw)
+![Process Memory Map](diagrams/ch01-process-memory-map.svg)
 
 This diagram shows the six segments of a running C process. High addresses (stack) are at the top; low addresses (text/code) are at the bottom. The stack grows downward and the heap grows upward. For `hello.c`, only three segments are actively used: Text (the `main()` machine code), ROData (the `"Hello, World!\n"` string literal), and Stack (the 32-byte stack frame for `main`).
 
