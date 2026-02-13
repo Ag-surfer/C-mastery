@@ -1,11 +1,11 @@
 # C-Mastery — Build Progress
 
-## Status: Phase 0 — Setup Complete
+## Status: Phase 1 — Building Chapters
 
 ### Chapter Status
 | Ch | Title | Status | K&R Exercises | Diagrams | Tests |
 |---|---|---|---|---|---|
-| 01 | Hello Machine | ⬜ Not Started | 1-1, 1-2 | 0/2 | 0 |
+| 01 | Hello Machine | ✅ Complete | 1-1, 1-2 | 2/2 | 47 |
 | 02 | Compilation Model | ⬜ Not Started | — | 0/2 | 0 |
 | 03 | Process Memory Model | ⬜ Not Started | 1-13 | 0/3 | 0 |
 | 04 | Variables, Types & CPU | ⬜ Not Started | 2-1, 2-3 | 0/4 | 0 |
@@ -40,7 +40,7 @@
 | Database Engine | ⬜ Not Started | 1–24 |
 
 ### Totals
-- Chapters complete: 0/24
-- K&R exercises adapted: 0/~100
-- Excalidraw diagrams: 0/~55
-- Test harnesses: 0/~120
+- Chapters complete: 1/24
+- K&R exercises adapted: 2/~100
+- Excalidraw diagrams: 2/~55
+- Test harnesses: 3/~120
