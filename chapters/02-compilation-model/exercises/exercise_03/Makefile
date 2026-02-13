@@ -9,8 +9,8 @@ all: starter solution test_harness
 starter: starter.c
 	$(CC) $(CFLAGS) $(SANITIZE) -o $@ $<
 
-solution: solution.c
-	$(CC) $(CFLAGS) $(SANITIZE) -o $@ $<
+solution: solution.c solution_helper.c solution_helper.h
+	$(CC) $(CFLAGS) $(SANITIZE) -o $@ solution.c solution_helper.c
 
 test_harness: test.c
 	$(CC) $(CFLAGS) $(SANITIZE) -o $@ $<
@@ -19,5 +19,5 @@ test: solution test_harness
 	./test_harness
 
 clean:
-	rm -f starter solution test_harness
+	rm -f starter solution test_harness *.o
 	rm -rf *.dSYM

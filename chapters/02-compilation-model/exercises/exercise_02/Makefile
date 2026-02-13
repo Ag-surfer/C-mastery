@@ -19,5 +19,5 @@ test: solution test_harness
 	./test_harness
 
 clean:
-	rm -f starter solution test_harness
+	rm -f starter solution test_harness *.o
 	rm -rf *.dSYM

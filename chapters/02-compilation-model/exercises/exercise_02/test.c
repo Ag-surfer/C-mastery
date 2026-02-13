@@ -1,10 +1,10 @@
 /*
- * test.c — Preprocessor Detective
+ * test.c — Object File Explorer
  * Chapter 02: Compilation Model
- * Exercise 01 — Test Harness
+ * Exercise 02 — Test Harness
  *
  * Runs ./solution and verifies its output contains the correct
- * macro expansion values.
+ * nm symbol type letters and descriptions.
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,50 +49,47 @@ static int capture_solution_output(void) {
   return status;
 }
 
-TEST(max_size) {
-  /* Output must contain "MAX_SIZE = 100" */
-  ASSERT(strstr(output, "MAX_SIZE = 100") != NULL);
+TEST(global_function_symbol) {
+  /* global_function should be T (global text) */
+  ASSERT(strstr(output, "global_function:    T") != NULL);
+  ASSERT(strstr(output, "global text") != NULL);
 }
 
-TEST(square) {
-  /* Output must contain "SQUARE(5) = 25" */
-  ASSERT(strstr(output, "SQUARE(5) = 25") != NULL);
+TEST(local_function_symbol) {
+  /* local_function (static) should be t (local text) */
+  ASSERT(strstr(output, "local_function:     t") != NULL);
+  ASSERT(strstr(output, "local text") != NULL);
 }
 
-TEST(concat) {
-  /* Output must contain "CONCAT(my,_var) = 99" */
-  ASSERT(strstr(output, "CONCAT(my,_var) = 99") != NULL);
+TEST(printf_symbol) {
+  /* printf should be U (undefined, external) */
+  ASSERT(strstr(output, "printf:             U") != NULL);
+  ASSERT(strstr(output, "undefined") != NULL);
 }
 
-TEST(stringify) {
-  /* Output must contain "STRINGIFY(hello) = hello" */
-  ASSERT(strstr(output, "STRINGIFY(hello) = hello") != NULL);
+TEST(global_initialized_symbol) {
+  /* global_initialized should be D (global data) */
+  ASSERT(strstr(output, "global_initialized: D") != NULL);
+  ASSERT(strstr(output, "global data") != NULL);
 }
 
-TEST(file_macro) {
-  /* Output must contain "solution" as part of __FILE__ value */
-  ASSERT(strstr(output, "__FILE__") != NULL);
-  ASSERT(strstr(output, "solution") != NULL);
+TEST(global_uninitialized_symbol) {
+  /* global_uninitialized should be C (common) */
+  ASSERT(strstr(output, "global_uninitialized: C") != NULL);
+  ASSERT(strstr(output, "common") != NULL);
 }
 
-TEST(line_macro) {
-  /* Output must contain "__LINE__ = " followed by some number > 0 */
-  const char *p = strstr(output, "__LINE__ = ");
-  ASSERT(p != NULL);
-  if (p) {
-    int line_val = atoi(p + strlen("__LINE__ = "));
-    ASSERT(line_val > 0);
-  }
+TEST(static_var_symbol) {
+  /* static_var should be d (local data) */
+  ASSERT(strstr(output, "static_var:         d") != NULL);
+  ASSERT(strstr(output, "local data") != NULL);
 }
 
-TEST(stdc_version) {
-  /* Output must contain "201112" (C11) for __STDC_VERSION__ */
-  ASSERT(strstr(output, "201112") != NULL);
-}
-
-TEST(debug_block) {
-  /* Without -DDEBUG, output must contain "not compiled" */
-  ASSERT(strstr(output, "DEBUG block: not compiled") != NULL);
+TEST(values_correct) {
+  /* Verify the actual variable values are printed */
+  ASSERT(strstr(output, "global_initialized = 42") != NULL);
+  ASSERT(strstr(output, "global_uninitialized = 0") != NULL);
+  ASSERT(strstr(output, "static_var = 7") != NULL);
 }
 
 int main(void) {
@@ -103,14 +100,13 @@ int main(void) {
     return EXIT_FAILURE;
   }
 
-  test_max_size();
-  test_square();
-  test_concat();
-  test_stringify();
-  test_file_macro();
-  test_line_macro();
-  test_stdc_version();
-  test_debug_block();
+  test_global_function_symbol();
+  test_local_function_symbol();
+  test_printf_symbol();
+  test_global_initialized_symbol();
+  test_global_uninitialized_symbol();
+  test_static_var_symbol();
+  test_values_correct();
 
   printf("Results: %d passed, %d failed\n", tests_passed, tests_failed);
   return tests_failed > 0 ? EXIT_FAILURE : EXIT_SUCCESS;

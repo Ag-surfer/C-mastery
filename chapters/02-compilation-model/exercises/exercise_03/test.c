@@ -1,10 +1,10 @@
 /*
- * test.c — Preprocessor Detective
+ * test.c — Separate Compilation
  * Chapter 02: Compilation Model
- * Exercise 01 — Test Harness
+ * Exercise 03 — Test Harness
  *
- * Runs ./solution and verifies its output contains the correct
- * macro expansion values.
+ * Runs ./solution (the multi-file build) and verifies its output
+ * matches the expected factorial, fibonacci, and call count values.
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,50 +49,51 @@ static int capture_solution_output(void) {
   return status;
 }
 
-TEST(max_size) {
-  /* Output must contain "MAX_SIZE = 100" */
-  ASSERT(strstr(output, "MAX_SIZE = 100") != NULL);
+TEST(factorial_5) {
+  /* 5! = 120 */
+  ASSERT(strstr(output, "factorial(5) = 120") != NULL);
 }
 
-TEST(square) {
-  /* Output must contain "SQUARE(5) = 25" */
-  ASSERT(strstr(output, "SQUARE(5) = 25") != NULL);
+TEST(factorial_10) {
+  /* 10! = 3628800 */
+  ASSERT(strstr(output, "factorial(10) = 3628800") != NULL);
 }
 
-TEST(concat) {
-  /* Output must contain "CONCAT(my,_var) = 99" */
-  ASSERT(strstr(output, "CONCAT(my,_var) = 99") != NULL);
+TEST(fibonacci_10) {
+  /* fib(10) = 55 */
+  ASSERT(strstr(output, "fibonacci(10) = 55") != NULL);
 }
 
-TEST(stringify) {
-  /* Output must contain "STRINGIFY(hello) = hello" */
-  ASSERT(strstr(output, "STRINGIFY(hello) = hello") != NULL);
+TEST(fibonacci_20) {
+  /* fib(20) = 6765 */
+  ASSERT(strstr(output, "fibonacci(20) = 6765") != NULL);
 }
 
-TEST(file_macro) {
-  /* Output must contain "solution" as part of __FILE__ value */
-  ASSERT(strstr(output, "__FILE__") != NULL);
-  ASSERT(strstr(output, "solution") != NULL);
+TEST(call_count) {
+  /* 4 function calls total: factorial(5), factorial(10), fib(10), fib(20) */
+  ASSERT(strstr(output, "Total function calls: 4") != NULL);
 }
 
-TEST(line_macro) {
-  /* Output must contain "__LINE__ = " followed by some number > 0 */
-  const char *p = strstr(output, "__LINE__ = ");
-  ASSERT(p != NULL);
-  if (p) {
-    int line_val = atoi(p + strlen("__LINE__ = "));
-    ASSERT(line_val > 0);
+TEST(output_order) {
+  /* Verify output appears in the expected order */
+  const char *p1 = strstr(output, "factorial(5)");
+  const char *p2 = strstr(output, "factorial(10)");
+  const char *p3 = strstr(output, "fibonacci(10)");
+  const char *p4 = strstr(output, "fibonacci(20)");
+  const char *p5 = strstr(output, "Total function calls");
+
+  ASSERT(p1 != NULL);
+  ASSERT(p2 != NULL);
+  ASSERT(p3 != NULL);
+  ASSERT(p4 != NULL);
+  ASSERT(p5 != NULL);
+
+  if (p1 && p2 && p3 && p4 && p5) {
+    ASSERT(p1 < p2);
+    ASSERT(p2 < p3);
+    ASSERT(p3 < p4);
+    ASSERT(p4 < p5);
   }
-}
-
-TEST(stdc_version) {
-  /* Output must contain "201112" (C11) for __STDC_VERSION__ */
-  ASSERT(strstr(output, "201112") != NULL);
-}
-
-TEST(debug_block) {
-  /* Without -DDEBUG, output must contain "not compiled" */
-  ASSERT(strstr(output, "DEBUG block: not compiled") != NULL);
 }
 
 int main(void) {
@@ -103,14 +104,12 @@ int main(void) {
     return EXIT_FAILURE;
   }
 
-  test_max_size();
-  test_square();
-  test_concat();
-  test_stringify();
-  test_file_macro();
-  test_line_macro();
-  test_stdc_version();
-  test_debug_block();
+  test_factorial_5();
+  test_factorial_10();
+  test_fibonacci_10();
+  test_fibonacci_20();
+  test_call_count();
+  test_output_order();
 
   printf("Results: %d passed, %d failed\n", tests_passed, tests_failed);
   return tests_failed > 0 ? EXIT_FAILURE : EXIT_SUCCESS;
