@@ -6,7 +6,7 @@
 | Ch | Title | Status | K&R Exercises | Diagrams | Tests |
 |---|---|---|---|---|---|
 | 01 | Hello Machine | ✅ Complete | 1-1, 1-2 | 2/2 | 47 |
-| 02 | Compilation Model | ⬜ Not Started | — | 0/2 | 0 |
+| 02 | Compilation Model | ✅ Complete | — (3 original) | 2/2 | 39 |
 | 03 | Process Memory Model | ⬜ Not Started | 1-13 | 0/3 | 0 |
 | 04 | Variables, Types & CPU | ⬜ Not Started | 2-1, 2-3 | 0/4 | 0 |
 | 05 | Operators & the ALU | ⬜ Not Started | 2-4 through 2-10 | 0/2 | 0 |
@@ -40,7 +40,7 @@
 | Database Engine | ⬜ Not Started | 1–24 |
 
 ### Totals
-- Chapters complete: 1/24
+- Chapters complete: 2/24
 - K&R exercises adapted: 2/~100
-- Excalidraw diagrams: 2/~55
-- Test harnesses: 3/~120
+- Excalidraw diagrams: 4/~55
+- Test harnesses: 6/~120
