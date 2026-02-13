@@ -1,0 +1,126 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '--- C-Mastery Session Start ---'; if [ -f PROGRESS.md ]; then head -5 PROGRESS.md; fi; echo 'Chapters built:'; ls -d chapters/*/README.md 2>/dev/null | wc -l | tr -d ' '; echo '/24'",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash(git commit*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Running compilation check...'; failed=0; for f in $(find chapters/ -name '*.c' -not -path '*/solution*' 2>/dev/null | head -20); do gcc -Wall -Wextra -Werror -std=c11 -pedantic -fsyntax-only \"$f\" 2>&1 || failed=1; done; if [ $failed -eq 1 ]; then echo '{\"block\": true, \"message\": \"C files have compilation errors — fix before committing\"}' >&2; exit 2; fi",
+            "timeout": 60
+          }
+        ]
+      },
+      {
+        "matcher": "Write(.env*)|Edit(.env*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"block\": true, \"message\": \"Cannot write to .env files directly\"}' >&2; exit 2",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit(*.c)|Write(*.c)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_input.path' | xargs -I{} clang-format -i -style='{BasedOnStyle: LLVM, IndentWidth: 4, ColumnLimit: 100}' {} 2>/dev/null; jq -r '.tool_input.file_path // .tool_input.path' | xargs -I{} gcc -Wall -Wextra -std=c11 -pedantic -fsyntax-only {} 2>&1 | tail -5",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Edit(*.h)|Write(*.h)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_input.path' | xargs -I{} clang-format -i -style='{BasedOnStyle: LLVM, IndentWidth: 4, ColumnLimit: 100}' {} 2>/dev/null; FILE=$(jq -r '.tool_input.file_path // .tool_input.path'); GUARD=$(echo \"$FILE\" | sed 's/[^a-zA-Z0-9]/_/g' | tr 'a-z' 'A-Z'); grep -q '#ifndef' \"$FILE\" || echo \"WARNING: Missing header guard in $FILE (expected $GUARD)\"",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "Edit(*.md)|Write(*.md)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_input.path' | xargs -I{} sh -c 'if echo {} | grep -q \"chapters/.*/README.md\"; then grep -c \"## Layer\" {} | xargs -I@ sh -c \"if [ @ -lt 5 ]; then echo WARNING: README {} has only @ of 5 required layers; fi\"; fi'",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "Edit(*.c)|Write(*.c)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'C file operation failed. Common issues: missing #include, undeclared variable, type mismatch. Run gcc with -Wall -Wextra for details.'",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Review the teammate's output. Check: 1) Do all .c files have the standard header comment block? 2) Are assembly annotations present (// ASSEMBLY: prefix)? 3) Are memory annotations present (// MEMORY: prefix)? 4) Do exercises have both starter.c and solution.c? Return 'approve' if all checks pass, or specific feedback if not.",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mkdir -p .claude/transcripts; cp PROGRESS.md .claude/transcripts/progress-backup-$(date +%Y%m%d%H%M%S).md 2>/dev/null; echo 'CRITICAL STATE TO PRESERVE: Current chapter progress in PROGRESS.md, c-style-guide conventions, K&R exercise mapping. Always re-read CLAUDE.md after compaction.'",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude needs your attention\" with title \"C-Mastery\" sound name \"Ping\"' 2>/dev/null || echo 'NOTIFICATION: Claude needs input'"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Task complete\" with title \"C-Mastery\" sound name \"Glass\"' 2>/dev/null || echo 'TASK COMPLETE'"
+          }
+        ]
+      }
+    ]
+  }
+}
